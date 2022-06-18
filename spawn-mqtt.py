@@ -49,7 +49,7 @@ def on_message(client, userdata, msg):
     # craft a response
     data = {
         "deviceName": DEV,
-        "message": "this is a response"
+        "message": RES
     }
     resp = json.dumps(data)
     uid=msg.topic.split("/")[-1]
@@ -63,7 +63,11 @@ def on_message(client, userdata, msg):
 
 # MAIN LOOP
 #seed(1)
+
 DEV = sys.argv[1]
+if sys.argv[2] is not None: RES=sys.argv[2]
+else RES="test response"
+
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
