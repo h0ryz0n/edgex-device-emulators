@@ -65,8 +65,8 @@ def on_message(client, userdata, msg):
 #seed(1)
 
 DEV = sys.argv[1]
-if sys.argv[2] is not None: RES=sys.argv[2]
-else: RES="test response"
+if len(sys.argv) < 3: RES="test response"
+else: RES=sys.argv[2]
 
 client = mqtt.Client()
 client.on_connect = on_connect
