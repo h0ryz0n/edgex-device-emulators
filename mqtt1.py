@@ -1,4 +1,8 @@
 # MQTT DEVICE EMULATOR FOR EDGEX
+
+# listen on topic: mosquitto_sub -d -h <host> -t <topic>
+# listen on all: mosquitto_sub -d -h <host> -t "#"
+
 #from random import seed
 #from random import randint
 import paho.mqtt.client as mqtt
