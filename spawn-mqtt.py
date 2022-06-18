@@ -53,7 +53,7 @@ def on_message(client, userdata, msg):
     }
     resp = json.dumps(data)
     uid=msg.topic.split("/")[-1]
-    topic="command/response/mqtt1/"+uid
+    topic="command/response/"+DEV+"/"+uid
     client.publish(topic, payload=resp)
 
 
