@@ -21,14 +21,26 @@ def on_message(client, userdata, msg):
     #ECHO MESSAGE
     print(msg.topic+" "+str(msg.payload))
     #JSON PARSE
-    data = json.loads(msg.payload)
+    #data = json.loads(msg.payload)
     #CRAFTING REPONSE
     #data['deviceName'] = "MQTT-test-device"
-    data['message'] = "this is a response TEST1"
-    resp = json.dumps(data)
+    #data['message'] = "this is a response TEST1"
+    #resp = json.dumps(data)
     #client.publish("ResponseTopic", payload=resp)
-    client.publish("rt0", payload=resp)
-    #client.publish("dt0", payload=resp)
+    #client.publish("reponse/mqtt1rt0", payload=resp)
+    #PARSER
+    cmd=msg.topic.split("/")
+
+    # is for me?
+    if cmd[1]=="mqtt1":
+        # is a command?
+        if cmd[0]=="command":
+            # craft response
+            uid=msg.topic.split("/")[-1]
+            topic="command/response/mqtt1/"+uid
+            client.publish(topic, payload=None)
+            exit
+
 
 # CRAFT A RANDOM READING [da capire e fare a parte]
 #randomdata = json.loads(msg.payload)
