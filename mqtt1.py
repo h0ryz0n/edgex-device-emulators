@@ -11,8 +11,10 @@ import json
 # CONNECT & SUBSCRIBE
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    #client.subscribe("CommandTopic/#")
-    client.subscribe("CommandTopic")
+    #client.subscribe("CommandTopic")
+    #multilevel-hell
+    client.subscribe("command/mqtt1/#")
+    
 
 # PUBLISH CALLBACK
 def on_message(client, userdata, msg):
