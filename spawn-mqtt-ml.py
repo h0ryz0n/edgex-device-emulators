@@ -1,6 +1,7 @@
 # MQTT MULTI LEVEL DEVICE EMULATOR FOR EDGEX
 # spawns an emulated mqtt device with multithreading
 # responds and generates async events
+# for PING you need to be root
 # 
 ## USAGE : spawn-mqtt-ml.py <device_name> <response>
 
@@ -11,6 +12,7 @@
 #from random import seed
 #from random import randint
 import paho.mqtt.client as mqtt
+from pythonping import ping
 import json
 import sys
 import time
@@ -46,11 +48,11 @@ def on_message(client, userdata, msg):
     
 # SIMULATE ASYNC EVENT    
 def gen_async_event(client):
-    topic="incoming/data/"+DEV+"/ping"; client.publish(topic, payload=None);
+    rttavg = ping(BROKER_HOST).rtt_avg_ms
+    topic="incoming/data/"+DEV+"/ping"; client.publish(topic, payload=rttavg)
     time.sleep(2.5)
     event="heartbeat "+DEV+" "+str(datetime.datetime.now())
-    topic="incoming/data/"+DEV+"/message";
-    client.publish(topic, payload=event);
+    topic="incoming/data/"+DEV+"/message"; client.publish(topic, payload=event)
 
   
 # MAIN
