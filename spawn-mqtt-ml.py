@@ -43,16 +43,16 @@ def on_message(client, userdata, msg):
     uid=msg.topic.split("/")[-1]
     topic="command/response/"+DEV+"/"+uid
     client.publish(topic, payload=resp)
-    async_t = threading.Thread(target=gen_async_event,args=(client,))
-    async_t.start()
+
     
 # SIMULATE ASYNC EVENT    
 def gen_async_event(client):
-    rttavg = ping(BROKER_HOST).rtt_avg_ms
-    topic="incoming/data/"+DEV+"/ping"; client.publish(topic, payload=rttavg)
-    time.sleep(2.5)
-    event="heartbeat "+DEV+" "+str(datetime.datetime.now())
-    topic="incoming/data/"+DEV+"/message"; client.publish(topic, payload=event)
+    while True:
+        rttavg = ping(BROKER_HOST).rtt_avg_ms
+        topic="incoming/data/"+DEV+"/ping"; client.publish(topic, payload=rttavg)
+        time.sleep(10)
+        event="heartbeat "+DEV+" "+str(datetime.datetime.now())
+        topic="incoming/data/"+DEV+"/message"; client.publish(topic, payload=event)
 
   
 # MAIN
@@ -67,5 +67,8 @@ client.on_connect = on_connect
 client.on_message = on_message
 #client.connect("edgex", 1883, 60)
 client.connect("edgex")
+#start async event simulator
+async_t = threading.Thread(target=gen_async_event,args=(client,))
+async_t.start()
 
 client.loop_forever()
