@@ -1,6 +1,10 @@
-# MQTT DEVICE EMULATOR FOR EDGEX
-## USAGE : spawn-mqtt.py <device_name>
+# MQTT MULTI LEVEL DEVICE EMULATOR FOR EDGEX
+# spawns an emulated mqtt device with multithreading
+# responds and generates async events
+# 
+## USAGE : spawn-mqtt-ml.py <device_name> <response>
 
+# UTILS FOR DEBUGGING
 # listen on topic: mosquitto_sub -d -h <host> -t <topic>
 # listen on all: mosquitto_sub -d -h <host> -t "#"
 
@@ -9,65 +13,52 @@
 import paho.mqtt.client as mqtt
 import json
 import sys
+import time
+import datetime
+import threading
+
+#BROKER_HOST="127.0.0.1"
+BROKER_HOST="edgex"
 
 # CONNECT & SUBSCRIBE
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    #client.subscribe("CommandTopic")
-    #multilevel-hell
     SRCTOPIC="command/"+DEV+"/#"
     client.subscribe(SRCTOPIC)
-    
 
 # PUBLISH CALLBACK
 def on_message(client, userdata, msg):
     #ECHO MESSAGE
     print(msg.topic+" "+str(msg.payload))
-    #JSON PARSE
-    #data = json.loads(msg.payload)
-    #CRAFTING REPONSE
-    #data['deviceName'] = "MQTT-test-device"
-    #data['message'] = "this is a response TEST1"
-    #resp = json.dumps(data)
-    #client.publish("ResponseTopic", payload=resp)
-    #client.publish("reponse/mqtt1rt0", payload=resp)
     #PARSER
     cmd=msg.topic.split("/")
-
-    # IF LISTENS ALL
-    # is for me?
-    #if cmd[1]=="mqtt1":
-        # is a command?
-        #if cmd[0]=="command":
-            # craft response
-            #uid=msg.topic.split("/")[-1]
-            #topic="command/response/mqtt1/"+uid
-            #client.publish(topic, payload=None)
-            #exit
-            
-    # IF LISTENS ONLY HIS TOPIC
-    # craft a response
+    #CRAFT TEST RESPONSE
     data = {
         "deviceName": DEV,
         "message": RES
     }
-    resp = json.dumps(data)
+    resp=json.dumps(data)
     uid=msg.topic.split("/")[-1]
     topic="command/response/"+DEV+"/"+uid
     client.publish(topic, payload=resp)
+    async_t = threading.Thread(target=gen_async_event,args=(client,))
+    async_t.start()
+    
+# SIMULATE ASYNC EVENT    
+def gen_async_event(client):
+    time.sleep(2.5)
+    event="heartbeat "+DEV+" "+str(datetime.datetime.now())
+    topic="incoming/data/"+DEV+"/message";
+    client.publish(topic, payload=event);
 
-
-# CRAFT A RANDOM READING [da capire e fare a parte]
-#randomdata = json.loads(msg.payload)
-#client.publish("DataTopic", payload=randomdata)
-
-# MAIN LOOP
+  
+# MAIN
 #seed(1)
-
+# CHECK INPUT
 DEV = sys.argv[1]
-if len(sys.argv) < 3: RES="test response"
+if len(sys.argv) < 3: RES="00000"
 else: RES=sys.argv[2]
-
+# LOOP
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
