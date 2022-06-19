@@ -46,6 +46,7 @@ def on_message(client, userdata, msg):
     
 # SIMULATE ASYNC EVENT    
 def gen_async_event(client):
+    topic="incoming/data/"+DEV+"/ping"; client.publish(topic, payload=None);
     time.sleep(2.5)
     event="heartbeat "+DEV+" "+str(datetime.datetime.now())
     topic="incoming/data/"+DEV+"/message";
