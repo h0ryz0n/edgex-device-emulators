@@ -8,5 +8,5 @@ while [ True ];
 do
   VAR=$((1 + RANDOM %10))
   coap-client -v9 -m post -t 0 -e $VAR $COAPURI
-  sleep(5)
+  sleep 5
 done
